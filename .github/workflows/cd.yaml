@@ -37,8 +37,8 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t $IMAGE_NAME:${{ steps.vars.sha.sha_short }} .
-          docker push $IMAGE_NAME:${{ steps.vars.sha.sha_short }}
+          docker build -t $IMAGE_NAME:${{ steps.sha.outputs.sha_short }} .
+          docker push $IMAGE_NAME:${{ steps.sha.outputs.sha_short }}
 
       # Deploy to Kubernetes with Helm
       - name: Set up Kubernetes
@@ -60,4 +60,4 @@ jobs:
           helm upgrade --install $HELM_RELEASE ./helm \
             --namespace $HELM_NAMESPACE \
             --create-namespace \
-            --set image.tag=${{ steps.vars.sha.sha_short }}
+            --set image.tag=${{ steps.sha.outputs.sha_short }}
