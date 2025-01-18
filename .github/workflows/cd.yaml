@@ -22,6 +22,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Get short version of sha
+      - name: Get short sha
+        id: sha
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       # Build Docker image
       - name: Log in to DockerHub
         uses: docker/login-action@v2
@@ -32,8 +37,8 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t $IMAGE_NAME:${{ github.sha }} .
-          docker push $IMAGE_NAME:${{ github.sha }}
+          docker build -t $IMAGE_NAME:${{ steps.vars.sha.sha_short }} .
+          docker push $IMAGE_NAME:${{ steps.vars.sha.sha_short }}
 
       # Deploy to Kubernetes with Helm
       - name: Set up Kubernetes
@@ -54,4 +59,5 @@ jobs:
           export KUBECONFIG=kubeconfig
           helm upgrade --install $HELM_RELEASE ./helm \
             --namespace $HELM_NAMESPACE \
-            --set image.tag=${{ github.sha }}
+            --create-namespace \
+            --set image.tag=${{ steps.vars.sha.sha_short }}
