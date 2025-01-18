@@ -1,0 +1,5 @@
+creation_rules:
+  - path_regex: sops-secrets\.clear\.yaml
+    encrypted_regex: '^(data|stringData)$'
+    pgp: 4DD454CA8F2056D5F0B7467841E83C8C6C68AC19
+    age: age1cdmjhfczjk8vfe69umnv3vufxhxv3ww3k5405h6f6v9mxhupkepqc03sul

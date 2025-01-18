@@ -1,0 +1,8 @@
+.env
+
+sops-secrets.clear.yaml
+
+node_modules
+dist
+.idea
+.vscode

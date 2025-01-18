@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ddns-anywhere-cj
+spec:
+  schedule: {{ .Values.cron | quote }}
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 300
+      backoffLimit: 3
+      podReplacementPolicy: Failed
+      template:
+        metadata:
+          name: ddns-anywhere
+        spec:
+          imagePullSecrets:
+          {{- range .Values.imagePullSecrets | uniq }}
+          - name: {{ . }}
+          {{- end }}
+          containers:
+            - name: node
+              image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 100m
+                  memory: 128Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                privileged: false
+                capabilities:
+                  drop:
+                    - ALL
+              envFrom:
+                - secretRef:
+                    name: env-config-secret
+          restartPolicy: OnFailure
